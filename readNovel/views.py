@@ -1,5 +1,6 @@
+import os
 import re
-from urllib.request import urlopen
+from urllib.request import urlopen, urlretrieve
 
 from bs4 import BeautifulSoup
 from django.contrib import messages
@@ -84,6 +85,8 @@ def saveNovelInfo(novelInfo):
     cover = bsObj.find("div", {"class": "cover"})
     novelInfo.avatar = cover.find("img").attrs['src']
     small = bsObj.find("div", {"class": "small"})
+    path = mkdir(bsObj.h2.get_text())
+    urlretrieve(novelInfo.website + cover.find("img").attrs['src'], path + '\\1.jpg')
     for child in small.children:
         label = child.get_text().split("：")[0]
         value = child.get_text().split("：")[1]
@@ -107,14 +110,10 @@ def saveNovelInfo(novelInfo):
 def update_chapter(request, novel_id):
     novelInfo = NovelInfo.objects.get(id=novel_id)
     chapters = novelInfo.chapter_set.order_by('-createtime')
-
     html = urlopen(novelInfo.website + novelInfo.novelId)
     bsObj = BeautifulSoup(html, "lxml")
-
     chapterList = bsObj.findAll("a", {"href": re.compile(novelInfo.novelId + "\/-?[1-9]\d*\.html")})
-
     update_count = len(chapterList[13:]) - len(chapters)
-
     chapterListToDB = chapterList[-update_count:]
 
     if update_count > 0:
@@ -133,3 +132,12 @@ def update_chapter(request, novel_id):
         messages.success(request, '没有新章节！')
 
     return HttpResponseRedirect(reverse('readNovel:novelList'))
+
+
+def mkdir(path):
+    path = path.strip()
+    dir = "D:\\test\\photos\\"
+    isExists = os.path.exists(os.path.join(dir, path))
+    if not isExists:
+        os.makedirs(os.path.join(dir, path))
+    return dir + path
