@@ -19,4 +19,5 @@ from django.contrib import admin
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'', include('readNovel.urls', namespace='readNovel')),
+    url(r'', include('writeNovel.urls', namespace='writeNovel')),
 ]
