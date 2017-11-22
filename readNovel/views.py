@@ -3,6 +3,7 @@ import re
 from urllib.request import urlopen, urlretrieve
 
 from bs4 import BeautifulSoup
+from django.conf import settings
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -85,8 +86,9 @@ def saveNovelInfo(novelInfo):
     cover = bsObj.find("div", {"class": "cover"})
     novelInfo.avatar = cover.find("img").attrs['src']
     small = bsObj.find("div", {"class": "small"})
-    path = mkdir(bsObj.h2.get_text())
-    urlretrieve(novelInfo.website + cover.find("img").attrs['src'], path + '\\1.jpg')
+    avatar = settings.PIC_DIR + novelInfo.novelId + '.jpg'
+    # novelInfo.avatar = avatar
+    urlretrieve(novelInfo.website + cover.find("img").attrs['src'], avatar)
     for child in small.children:
         label = child.get_text().split("：")[0]
         value = child.get_text().split("：")[1]
@@ -136,8 +138,12 @@ def update_chapter(request, novel_id):
 
 def mkdir(path):
     path = path.strip()
-    dir = "D:\\test\\photos\\"
+    dir = settings.PIC_DIR
     isExists = os.path.exists(os.path.join(dir, path))
     if not isExists:
         os.makedirs(os.path.join(dir, path))
     return dir + path
+
+
+def global_setting(request):
+    return {'PIC_DIR': settings.PIC_DIR}
