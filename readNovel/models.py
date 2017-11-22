@@ -38,7 +38,7 @@ class NovelInfo(BaseInfo):
 
 class Chapter(BaseInfo):
     """ 小说章节信息 """
-    href = models.CharField(max_length=200, verbose_name=u'小说具体链接')
+    href = models.CharField(max_length=200, verbose_name=u'小说章节具体链接')
     content = models.TextField(verbose_name=u'章节具体内容')
     serial_number = models.IntegerField(verbose_name=u'章节序号')
     novelInfo = models.ForeignKey(NovelInfo, verbose_name=u'所属小说')
